@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 declare global {
   interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Razorpay: any;
   }
 }
@@ -16,7 +17,7 @@ interface RazorpayPaymentProps {
   userId: string;
   description: string;
   onSuccess?: () => void;
-  onError?: (error: any) => void;
+  onError?: (error: unknown) => void;
 }
 
 export function RazorpayPayment({
@@ -90,7 +91,7 @@ export function RazorpayPayment({
         name: "Job Marshal",
         description: description,
         order_id: order.orderId,
-        handler: async function (response: any) {
+        handler: async function (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) {
           try {
             // Verify payment on server
             const verifyResponse = await fetch("/api/razorpay/verify-payment", {

@@ -33,6 +33,17 @@ import { prisma } from "@/app/utils/db";
 import { requireUser } from "@/app/utils/hooks";
 import { CopyLinkMenuItem } from "@/components/general/CopyLink";
 
+type JobListing = {
+  id: string;
+  jobTitle: string;
+  status: string;
+  createdAt: Date;
+  company: {
+    name: string;
+    logo: string | null;
+  };
+};
+
 async function getJobs(userId: string) {
   const data = await prisma.jobPost.findMany({
     where: {
@@ -95,7 +106,7 @@ const MyJobs = async () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.map((listing) => (
+                {data.map((listing: JobListing) => (
                   <TableRow key={listing.id}>
                     <TableCell>
                       {listing.company.logo ? (

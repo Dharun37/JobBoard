@@ -4,7 +4,6 @@ import { z } from "zod";
 import { requireUser } from "./hooks";
 import { jobSchema } from "./zodSchemas";
 import { prisma } from "./db";
-import { redirect } from "next/navigation";
 import { jobListingDurationPricing } from "./pricingTiers";
 
 // Simplified Razorpay payment action

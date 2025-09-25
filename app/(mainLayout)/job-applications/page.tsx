@@ -7,6 +7,29 @@ import { Button } from "@/components/ui/button";
 import { Eye, Download, CheckCircle, XCircle, Clock } from "lucide-react";
 import Link from "next/link";
 
+type JobApplication = {
+  id: string;
+  coverLetter: string | null;
+  appliedAt: Date;
+  status: string;
+  job: {
+    id: string;
+    jobTitle: string;
+    location: string;
+    employmentType: string;
+  };
+  user: {
+    id: string;
+    name: string | null;
+    email: string;
+    JobSeeker: {
+      name: string;
+      about: string | null;
+      resume: string | null;
+    } | null;
+  };
+};
+
 async function getJobApplications(userId: string) {
   // Get company for this user
   const company = await prisma.company.findUnique({
@@ -71,7 +94,7 @@ const JobApplicationsPage = async () => {
     redirect("/");
   }
 
-  const applications = await getJobApplications(session.user.id);
+  const applications = await getJobApplications(session.user.id!);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -104,7 +127,7 @@ const JobApplicationsPage = async () => {
         <Card className="p-8 text-center">
           <h3 className="text-lg font-semibold mb-2">No applications yet</h3>
           <p className="text-muted-foreground mb-4">
-            When job seekers apply to your jobs, they'll appear here.
+            When job seekers apply to your jobs, they&apos;ll appear here.
           </p>
           <Button asChild>
             <Link href="/post-job">Post Your First Job</Link>
@@ -112,7 +135,7 @@ const JobApplicationsPage = async () => {
         </Card>
       ) : (
         <div className="space-y-4">
-          {applications.map((application) => (
+          {applications.map((application: JobApplication) => (
             <Card key={application.id} className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>

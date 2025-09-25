@@ -16,7 +16,7 @@ const CancelledPage = () => {
           <div className="mt-3 text-center sm:mt-5 w-full">
             <h2 className="text-xl font-semibold">Payment Cancelled</h2>
             <p className="text-sm mt-2 text-muted-foreground tracking-tight">
-              No worries, you won't be charged. Your job posting is saved as draft.
+              No worries, you won&apos;t be charged. Your job posting is saved as draft.
               You can complete the payment later to publish it.
             </p>
 

@@ -1,7 +1,7 @@
 import { prisma } from "@/app/utils/db";
-import { verifyPaymentSignature } from "@/app/utils/razorpay";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { createHmac } from "crypto";
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,9 +15,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify webhook signature
-    const crypto = require("crypto");
-    const expectedSignature = crypto
-      .createHmac("sha256", process.env.RAZORPAY_WEBHOOK_SECRET!)
+    const expectedSignature = createHmac("sha256", process.env.RAZORPAY_WEBHOOK_SECRET!)
       .update(body)
       .digest("hex");
 

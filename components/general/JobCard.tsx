@@ -20,8 +20,8 @@ interface iAppProps {
     company: {
       logo: string | null;
       name: string;
-      about: string;
-      location: string;
+      about: string | null;
+      location: string | null;
     };
   };
 }

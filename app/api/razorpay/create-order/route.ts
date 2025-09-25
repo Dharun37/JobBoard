@@ -1,5 +1,4 @@
 import { razorpay } from "@/app/utils/razorpay";
-import { prisma } from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {

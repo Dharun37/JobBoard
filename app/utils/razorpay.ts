@@ -1,4 +1,5 @@
 import Razorpay from "razorpay";
+import { createHmac } from "crypto";
 
 // Only initialize Razorpay in development mode
 const isDevelopment = process.env.NODE_ENV === "development";
@@ -65,9 +66,7 @@ export function verifyPaymentSignature(
   }
   
   try {
-    const crypto = require("crypto");
-    const expectedSignature = crypto
-      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
+    const expectedSignature = createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
       .update(orderId + "|" + paymentId)
       .digest("hex");
     

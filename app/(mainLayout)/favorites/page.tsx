@@ -10,8 +10,8 @@ type FavoriteWithJob = {
   job: {
     id: string;
     jobTitle: string;
-    salaryFrom: number | null;
-    salaryTo: number | null;
+    salaryFrom: number;
+    salaryTo: number;
     employmentType: string;
     location: string;
     createdAt: Date;

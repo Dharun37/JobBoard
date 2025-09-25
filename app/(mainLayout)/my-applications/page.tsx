@@ -8,6 +8,25 @@ import { Eye, CheckCircle, XCircle, Clock, Building } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
+type UserApplication = {
+  id: string;
+  appliedAt: Date;
+  status: string;
+  coverLetter: string | null;
+  job: {
+    id: string;
+    jobTitle: string;
+    location: string;
+    employmentType: string;
+    salaryFrom: number;
+    salaryTo: number;
+    company: {
+      name: string;
+      logo: string | null;
+    };
+  };
+};
+
 async function getUserApplications(userId: string) {
   const applications = await prisma.jobApplication.findMany({
     where: { userId },
@@ -48,7 +67,7 @@ const MyApplicationsPage = async () => {
     redirect("/");
   }
 
-  const applications = await getUserApplications(session.user.id);
+  const applications = await getUserApplications(session.user.id!);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -89,7 +108,7 @@ const MyApplicationsPage = async () => {
         </Card>
       ) : (
         <div className="space-y-4">
-          {applications.map((application) => (
+          {applications.map((application: UserApplication) => (
             <Card key={application.id} className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-start gap-4">

@@ -5,11 +5,9 @@ import { requireUser } from "./utils/hooks";
 import { companySchema, jobSchema, jobSeekerSchema } from "./utils/zodSchemas";
 import { prisma } from "./utils/db";
 import { redirect } from "next/navigation";
-import { jobListingDurationPricing } from "./utils/pricingTiers";
 import { revalidatePath } from "next/cache";
 import arcjet, { detectBot, shield } from "./utils/arcjet";
 import { request } from "@arcjet/next";
-import { inngest } from "./utils/inngest/client";
 
 const aj = arcjet
   .withRule(
