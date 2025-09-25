@@ -16,9 +16,20 @@ import {
 import { auth } from "@/app/utils/auth";
 import { ThemeToggle } from "./ThemeToggle";
 import { UserDropdown } from "./UserDropdown";
+import { prisma } from "@/app/utils/db";
 
 export async function Navbar() {
   const session = await auth();
+  
+  // Get user type to show appropriate navigation
+  let userType = null;
+  if (session?.user?.id) {
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { userType: true }
+    });
+    userType = user?.userType;
+  }
 
   return (
     <nav className="flex justify-between items-center py-5">
@@ -32,9 +43,35 @@ export async function Navbar() {
       {/* Desktop Navigation */}
       <div className="hidden md:flex items-center gap-5">
         <ThemeToggle />
-        <Link href="/post-job" className={buttonVariants({ size: "lg" })}>
-          Post Job
-        </Link>
+        {/* Show different navigation based on user type */}
+        {session?.user && userType === "COMPANY" && (
+          <>
+            <Link href="/post-job" className={buttonVariants({ size: "lg" })}>
+              Post Job
+            </Link>
+            <Link href="/job-applications" className={buttonVariants({ variant: "outline", size: "lg" })}>
+              Applications
+            </Link>
+            <Link href="/my-jobs" className={buttonVariants({ variant: "outline", size: "lg" })}>
+              My Jobs
+            </Link>
+          </>
+        )}
+        {session?.user && userType === "JOB_SEEKER" && (
+          <>
+            <Link href="/favorites" className={buttonVariants({ variant: "outline", size: "lg" })}>
+              Favorites
+            </Link>
+            <Link href="/my-applications" className={buttonVariants({ variant: "outline", size: "lg" })}>
+              My Applications
+            </Link>
+          </>
+        )}
+        {!session?.user && (
+          <Link href="/post-job" className={buttonVariants({ size: "lg" })}>
+            Post Job
+          </Link>
+        )}
         {session?.user ? (
           <UserDropdown
             email={session.user.email as string}

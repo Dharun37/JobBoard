@@ -10,39 +10,28 @@ declare global {
   }
 }
 
-interface RazorpayPaymentProps {
+interface SimpleRazorpayProps {
   amount: number;
   jobId: string;
   userId: string;
   description: string;
-  onSuccess?: () => void;
-  onError?: (error: any) => void;
 }
 
-export function RazorpayPayment({
+export function SimpleRazorpay({
   amount,
   jobId,
   userId,
   description,
-  onSuccess,
-  onError,
-}: RazorpayPaymentProps) {
+}: SimpleRazorpayProps) {
   const [loading, setLoading] = useState(false);
-  const isDevelopment = process.env.NODE_ENV === "development";
-
-  // Show warning if not in development mode
-  if (!isDevelopment) {
-    return (
-      <div className="p-4 border border-orange-200 bg-orange-50 rounded-lg">
-        <p className="text-orange-800 text-sm">
-          ⚠️ Razorpay payments are only available in development mode.
-        </p>
-      </div>
-    );
-  }
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+      
       const script = document.createElement("script");
       script.src = "https://checkout.razorpay.com/v1/checkout.js";
       script.onload = () => resolve(true);
@@ -59,15 +48,14 @@ export function RazorpayPayment({
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
         toast.error("Failed to load payment gateway");
+        setLoading(false);
         return;
       }
 
       // Create order
       const orderResponse = await fetch("/api/razorpay/create-order", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount,
           currency: "INR",
@@ -92,12 +80,10 @@ export function RazorpayPayment({
         order_id: order.orderId,
         handler: async function (response: any) {
           try {
-            // Verify payment on server
+            // Verify payment
             const verifyResponse = await fetch("/api/razorpay/verify-payment", {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
@@ -108,8 +94,6 @@ export function RazorpayPayment({
 
             if (verifyResponse.ok) {
               toast.success("Payment successful!");
-              onSuccess?.();
-              // Redirect to success page
               window.location.href = "/payment/success";
             } else {
               throw new Error("Payment verification failed");
@@ -117,25 +101,18 @@ export function RazorpayPayment({
           } catch (error) {
             console.error("Payment verification error:", error);
             toast.error("Payment verification failed");
-            onError?.(error);
           }
         },
         prefill: {
-          name: "Customer Name",
-          email: "customer@example.com",
+          name: "Test Customer",
+          email: "test@example.com",
           contact: "9999999999",
         },
-        notes: {
-          jobId,
-          userId,
-        },
-        theme: {
-          color: "#3399cc",
-        },
+        notes: { jobId, userId },
+        theme: { color: "#3399cc" },
         modal: {
           ondismiss: function () {
             toast.error("Payment cancelled");
-            // Redirect to cancel page
             window.location.href = "/payment/cancel";
           },
         },
@@ -146,7 +123,6 @@ export function RazorpayPayment({
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Failed to initiate payment");
-      onError?.(error);
     } finally {
       setLoading(false);
     }
@@ -154,10 +130,9 @@ export function RazorpayPayment({
 
   return (
     <div className="space-y-3">
-      {/* Development Mode Indicator */}
       <div className="flex items-center gap-2 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
         <span>🧪</span>
-        <span>TEST MODE - Use Razorpay test cards</span>
+        <span>TEST MODE - Use test card: 4111 1111 1111 1111</span>
       </div>
       
       <Button

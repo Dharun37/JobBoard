@@ -7,58 +7,52 @@ import { prisma } from "./db";
 import { redirect } from "next/navigation";
 import { jobListingDurationPricing } from "./pricingTiers";
 
-// Razorpay-specific payment action
-export async function createRazorpayPayment(
-  data: z.infer<typeof jobSchema>,
-  listingDuration: number
-) {
+// Simplified Razorpay payment action
+export async function createJobWithRazorpay(data: z.infer<typeof jobSchema>) {
   const user = await requireUser();
-
   const validatedData = jobSchema.parse(data);
 
+  // Find the company
   const company = await prisma.company.findUnique({
-    where: {
-      userId: user.id,
-    },
-    select: {
-      id: true,
-    },
+    where: { userId: user.id },
+    select: { id: true },
   });
 
   if (!company?.id) {
-    return redirect("/");
+    return { error: "Company not found" };
   }
 
-  // Create job post first
+  // Create job post as DRAFT
   const jobPost = await prisma.jobPost.create({
     data: {
       companyId: company.id,
       jobDescription: validatedData.jobDescription,
       jobTitle: validatedData.jobTitle,
       employmentType: validatedData.employmentType,
+      location: validatedData.location,
       salaryFrom: validatedData.salaryFrom,
       salaryTo: validatedData.salaryTo,
-      location: validatedData.location,
+      listingDuration: validatedData.listingDuration,
       benefits: validatedData.benefits,
-      listingDuration: listingDuration,
-      status: "DRAFT", // Will be updated after successful payment
+      status: "DRAFT", // Will be activated after payment
     },
   });
 
-  // Find pricing tier
+  // Get pricing info
   const pricingTier = jobListingDurationPricing.find(
-    (tier) => tier.days === listingDuration
+    (tier) => tier.days === validatedData.listingDuration
   );
 
   if (!pricingTier) {
-    throw new Error("Invalid listing duration selected");
+    return { error: "Invalid listing duration" };
   }
 
-  // Return data needed for frontend Razorpay integration
+  // Return data for Razorpay payment
   return {
+    success: true,
     jobId: jobPost.id,
     amount: pricingTier.price,
     description: `Job Posting - ${pricingTier.days} Days`,
-    userId: user.id,
+    userId: user.id || "", // Ensure it's always a string
   };
 }

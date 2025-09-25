@@ -21,6 +21,8 @@ export function SalaryRangeSelector({
   maxSalary = 200000,
   step = 1000,
 }: SalaryRangeSelectorProps) {
+  const [mounted, setMounted] = useState(false);
+  
   const { field: fromField } = useController({
     name: "salaryFrom",
     control,
@@ -36,6 +38,11 @@ export function SalaryRangeSelector({
     toField.value || maxSalary / 2,
   ]);
 
+  // Fix hydration mismatch by ensuring component only renders after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const handleRangeChange = (value: number[]) => {
     const newRange: [number, number] = [value[0], value[1]];
     setRange(newRange);
@@ -45,8 +52,27 @@ export function SalaryRangeSelector({
 
   // Update range when form values change externally
   useEffect(() => {
-    setRange([fromField.value || minSalary, toField.value || maxSalary / 2]);
-  }, [fromField.value, toField.value, minSalary, maxSalary]);
+    if (mounted) {
+      setRange([fromField.value || minSalary, toField.value || maxSalary / 2]);
+    }
+  }, [fromField.value, toField.value, minSalary, maxSalary, mounted]);
+
+  if (!mounted) {
+    // Return a placeholder during SSR to prevent hydration mismatch
+    return (
+      <div className="w-full space-y-4">
+        <div className="h-6 bg-muted rounded animate-pulse" />
+        <div className="flex justify-between">
+          <span className="text-sm text-muted-foreground">
+            {formatCurrency(minSalary)}
+          </span>
+          <span className="text-sm text-muted-foreground">
+            {formatCurrency(maxSalary / 2)}
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full space-y-4">

@@ -5,8 +5,6 @@ import { requireUser } from "./utils/hooks";
 import { companySchema, jobSchema, jobSeekerSchema } from "./utils/zodSchemas";
 import { prisma } from "./utils/db";
 import { redirect } from "next/navigation";
-import { stripe } from "./utils/stripe";
-// TODO: Replace with Razorpay implementation
 import { jobListingDurationPricing } from "./utils/pricingTiers";
 import { revalidatePath } from "next/cache";
 import arcjet, { detectBot, shield } from "./utils/arcjet";
@@ -93,107 +91,6 @@ export async function createJobSeeker(data: z.infer<typeof jobSeekerSchema>) {
   return redirect("/");
 }
 
-export async function createJob(data: z.infer<typeof jobSchema>) {
-  const user = await requireUser();
-
-  const validatedData = jobSchema.parse(data);
-
-  const company = await prisma.company.findUnique({
-    where: {
-      userId: user.id,
-    },
-    select: {
-      id: true,
-      user: {
-        select: {
-          stripeCustomerId: true,
-        },
-      },
-    },
-  });
-
-  if (!company?.id) {
-    return redirect("/");
-  }
-
-  let stripeCustomerId = company.user.stripeCustomerId;
-
-  if (!stripeCustomerId) {
-    const customer = await stripe.customers.create({
-      email: user.email!,
-      name: user.name || undefined,
-    });
-
-    stripeCustomerId = customer.id;
-
-    // Update user with Stripe customer ID
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { stripeCustomerId: customer.id },
-    });
-  }
-
-  const jobPost = await prisma.jobPost.create({
-    data: {
-      companyId: company.id,
-      jobDescription: validatedData.jobDescription,
-      jobTitle: validatedData.jobTitle,
-      employmentType: validatedData.employmentType,
-      location: validatedData.location,
-      salaryFrom: validatedData.salaryFrom,
-      salaryTo: validatedData.salaryTo,
-      listingDuration: validatedData.listingDuration,
-      benefits: validatedData.benefits,
-    },
-  });
-
-  // Trigger the job expiration function
-  await inngest.send({
-    name: "job/created",
-    data: {
-      jobId: jobPost.id,
-      expirationDays: validatedData.listingDuration,
-    },
-  });
-
-  // Get price from pricing tiers based on duration
-  const pricingTier = jobListingDurationPricing.find(
-    (tier) => tier.days === validatedData.listingDuration
-  );
-
-  if (!pricingTier) {
-    throw new Error("Invalid listing duration selected");
-  }
-
-  const session = await stripe.checkout.sessions.create({
-    customer: stripeCustomerId,
-    line_items: [
-      {
-        price_data: {
-          product_data: {
-            name: `Job Posting - ${pricingTier.days} Days`,
-            description: pricingTier.description,
-            images: [
-              "https://pve1u6tfz1.ufs.sh/f/Ae8VfpRqE7c0gFltIEOxhiBIFftvV4DTM8a13LU5EyzGb2SQ",
-            ],
-          },
-          currency: "USD",
-          unit_amount: pricingTier.price * 100, // Convert to cents for Stripe
-        },
-        quantity: 1,
-      },
-    ],
-    mode: "payment",
-    metadata: {
-      jobId: jobPost.id,
-    },
-    success_url: `${process.env.NEXT_PUBLIC_URL}/payment/success`,
-    cancel_url: `${process.env.NEXT_PUBLIC_URL}/payment/cancel`,
-  });
-
-  return redirect(session.url as string);
-}
-
 export async function updateJobPost(
   data: z.infer<typeof jobSchema>,
   jobId: string
@@ -266,4 +163,80 @@ export async function unsaveJobPost(savedJobPostId: string) {
   });
 
   revalidatePath(`/job/${data.jobId}`);
+}
+
+export async function applyToJob(formData: FormData) {
+  try {
+    const user = await requireUser();
+    const jobId = formData.get("jobId") as string;
+    const coverLetter = formData.get("coverLetter") as string | null;
+
+    // Check if user completed onboarding
+    const userData = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { 
+        onboardingCompleted: true,
+        userType: true,
+      },
+    });
+
+    if (!userData?.onboardingCompleted) {
+      redirect("/onboarding");
+    }
+
+    if (userData.userType !== "JOB_SEEKER") {
+      // Redirect to onboarding to complete/update profile
+      redirect("/onboarding");
+    }
+
+    // Check if user is a job seeker
+    const jobSeeker = await prisma.jobSeeker.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!jobSeeker) {
+      // User marked as job seeker but profile doesn't exist, redirect to onboarding
+      redirect("/onboarding");
+    }
+
+    // Check if already applied
+    const existingApplication = await prisma.jobApplication.findUnique({
+      where: {
+        userId_jobId: {
+          userId: user.id as string,
+          jobId: jobId,
+        },
+      },
+    });
+
+    if (existingApplication) {
+      throw new Error("You have already applied to this job.");
+    }
+
+    // Create the application
+    await prisma.jobApplication.create({
+      data: {
+        jobId: jobId,
+        userId: user.id as string,
+        coverLetter: coverLetter || null,
+      },
+    });
+
+    // Increment the applications count
+    await prisma.jobPost.update({
+      where: { id: jobId },
+      data: {
+        applications: {
+          increment: 1,
+        },
+      },
+    });
+
+    revalidatePath(`/job/${jobId}`);
+    redirect(`/job/${jobId}?applied=true`);
+    
+  } catch (error) {
+    console.error("Failed to apply to job:", error);
+    throw error; // Re-throw to be handled by the form
+  }
 }

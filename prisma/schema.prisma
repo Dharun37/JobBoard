@@ -22,14 +22,14 @@ model User {
 
   userType UserType?
 
-  stripeCustomerId String? @unique
   razorpayCustomerId String? @unique
 
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
   Company      Company?
   JobSeeker    JobSeeker?
   SavedJobPost SavedJobPost[]
+  JobApplication JobApplication[]
 }
 
 model Account {
@@ -139,9 +139,10 @@ model JobPost {
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId String
 
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
   SavedJobPost SavedJobPost[]
+  JobApplication JobApplication[]
 }
 
 enum JobPostStatus {
@@ -162,4 +163,29 @@ model SavedJobPost {
   updatedAt DateTime @updatedAt
 
   @@unique([userId, jobId])
+}
+
+model JobApplication {
+  id     String @id @default(uuid())
+  jobId  String
+  userId String
+
+  status ApplicationStatus @default(PENDING)
+  coverLetter String?
+  appliedAt DateTime @default(now())
+
+  job  JobPost @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, jobId])
+}
+
+enum ApplicationStatus {
+  PENDING
+  REVIEWED
+  ACCEPTED
+  REJECTED
 }

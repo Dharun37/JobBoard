@@ -35,7 +35,8 @@ import { SalaryRangeSelector } from "../general/SalaryRangeSelector";
 import JobDescriptionEditor from "../richTextEditor/JobDescriptionEditor";
 import BenefitsSelector from "../general/BenefitsSelector";
 import { JobListingDurationSelector } from "../general/JobListingDurationSelector";
-import { createJob } from "@/app/actions";
+import { createJobWithRazorpay } from "@/app/utils/createJobRazorpay";
+import { SimpleRazorpay } from "../general/SimpleRazorpay";
 
 interface CreateJobFormProps {
   companyName: string;
@@ -54,6 +55,13 @@ export function CreateJobForm({
   companyName,
   companyWebsite,
 }: CreateJobFormProps) {
+  const [paymentData, setPaymentData] = useState<{
+    jobId: string;
+    amount: number;
+    description: string;
+    userId: string;
+  } | null>(null);
+
   const form = useForm<z.infer<typeof jobSchema>>({
     resolver: zodResolver(jobSchema),
     defaultValues: {
@@ -75,16 +83,60 @@ export function CreateJobForm({
   });
 
   const [pending, setPending] = useState(false);
+  
   async function onSubmit(values: z.infer<typeof jobSchema>) {
     try {
       setPending(true);
-
-      await createJob(values);
-    } catch {
+      const result = await createJobWithRazorpay(values);
+      
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      
+      if (result.success) {
+        setPaymentData({
+          jobId: result.jobId,
+          amount: result.amount,
+          description: result.description,
+          userId: result.userId,
+        });
+        toast.success("Job created! Please complete payment to publish.");
+      }
+    } catch (error) {
       toast.error("Something went wrong. Please try again.");
+      console.error(error);
     } finally {
       setPending(false);
     }
+  }
+
+  // Show payment component if job was created successfully
+  if (paymentData) {
+    return (
+      <div className="col-span-1 lg:col-span-2 max-w-md mx-auto">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold">Complete Payment</h2>
+          <p className="text-gray-600">Your job post is ready! Complete the payment to publish it.</p>
+        </div>
+        
+        <SimpleRazorpay
+          amount={paymentData.amount}
+          jobId={paymentData.jobId}
+          userId={paymentData.userId}
+          description={paymentData.description}
+        />
+        
+        <div className="mt-4 text-center">
+          <button 
+            onClick={() => setPaymentData(null)}
+            className="text-sm text-gray-500 hover:text-gray-700"
+          >
+            ← Back to edit job details
+          </button>
+        </div>
+      </div>
+    );
   }
   return (
     <Form {...form}>

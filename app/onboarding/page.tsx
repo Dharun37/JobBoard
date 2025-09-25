@@ -10,10 +10,12 @@ async function checkIfOnboardingCompleted(userId: string) {
     where: { id: userId },
     select: {
       onboardingCompleted: true,
+      userType: true,
     },
   });
 
-  if (user?.onboardingCompleted === true) {
+  // Only redirect if onboarding is completed AND userType is properly set
+  if (user?.onboardingCompleted === true && user?.userType) {
     redirect("/");
   }
 }
