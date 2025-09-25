@@ -1,0 +1,18 @@
+{
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "DATABASE_URL": "@database_url",
+    "AUTH_SECRET": "@auth_secret",
+    "AUTH_GITHUB_ID": "@auth_github_id", 
+    "AUTH_GITHUB_SECRET": "@auth_github_secret",
+    "AUTH_GOOGLE_ID": "@auth_google_id",
+    "AUTH_GOOGLE_SECRET": "@auth_google_secret",
+    "UPLOADTHING_TOKEN": "@uploadthing_token",
+    "ARCJET_KEY": "@arcjet_key",
+    "NEXTAUTH_URL": "@nextauth_url"
+  }
+}
