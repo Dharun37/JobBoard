@@ -88,7 +88,7 @@ export function RazorpayPayment({
         key: order.key,
         amount: order.amount,
         currency: order.currency,
-        name: "Job Marshal",
+        name: "Job Board",
         description: description,
         order_id: order.orderId,
         handler: async function (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) {

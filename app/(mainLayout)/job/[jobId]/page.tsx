@@ -255,7 +255,7 @@ const JobIdPage = async ({
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">
                     Please let {jobData.company.name} know you found this job on
-                    JobMarshal. This helps us grow!
+                    JobBoard. This helps us grow!
                   </p>
                   {session?.user ? (
                     userType === "JOB_SEEKER" ? (
