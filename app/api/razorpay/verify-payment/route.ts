@@ -36,14 +36,36 @@ export async function POST(req: NextRequest) {
     }
 
     // Update job post status to ACTIVE
-    await prisma.jobPost.update({
+    const updatedJob = await prisma.jobPost.update({
       where: {
         id: jobId,
       },
       data: {
         status: "ACTIVE",
       },
+      select: {
+        id: true,
+        listingDuration: true,
+      },
     });
+
+    // Trigger Inngest job expiration event
+    console.log("🔄 Triggering Inngest event for job:", updatedJob.id);
+    
+    try {
+      const { inngest } = await import("@/app/utils/inngest/client");
+      const inngestResult = await inngest.send({
+        name: "job/created",
+        data: {
+          jobId: updatedJob.id,
+          expirationDays: updatedJob.listingDuration,
+        },
+      });
+      
+      console.log("✅ Inngest event sent successfully:", inngestResult);
+    } catch (inngestError) {
+      console.error("❌ Failed to send Inngest event:", inngestError);
+    }
 
     console.log("✅ TEST payment verified and job activated:", jobId);
 

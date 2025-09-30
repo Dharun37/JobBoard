@@ -16,12 +16,12 @@ import { requireUser } from "@/app/utils/hooks";
 import { redirect } from "next/navigation";
 
 const companies = [
-  { id: 0, name: "ArcJet", logo: ArcJetLogo },
-  { id: 1, name: "Inngest", logo: InngestLogo },
-  { id: 2, name: "ArcJet", logo: ArcJetLogo },
-  { id: 3, name: "Inngest", logo: InngestLogo },
-  { id: 4, name: "ArcJet", logo: ArcJetLogo },
-  { id: 5, name: "Inngest", logo: InngestLogo },
+  { id: 1, name: "TechCorp", logo: "/companies/techcorp.svg" },
+  { id: 2, name: "DataFlow", logo: "/companies/dataflow.svg" },
+  { id: 3, name: "CloudSync", logo: "/companies/cloudsync.svg" },
+  { id: 4, name: "NexusAI", logo: "/companies/nexusai.svg" },
+  { id: 5, name: "MetricsPro", logo: "/companies/metricspro.svg" },
+  { id: 6, name: "VelocityLabs", logo: "/companies/velocitylabs.svg" },
 ];
 
 const testimonials = [
@@ -67,8 +67,15 @@ async function getCompany(userId: string) {
     },
   });
 
+  console.log("Company check:", {
+    userId,
+    hasCompany: !!data,
+    companyData: data ? "exists" : "missing"
+  });
+
   if (!data) {
-    return redirect("/");
+    console.log("No company found, redirecting to onboarding");
+    return redirect("/onboarding?returnTo=/post-job");
   }
   return data;
 }

@@ -12,7 +12,11 @@ import JobSeekerForm from "./JobSeekerForm";
 
 type UserType = "company" | "jobSeeker" | null;
 
-export default function OnboardingForm() {
+interface OnboardingFormProps {
+  returnTo?: string;
+}
+
+export default function OnboardingForm({ returnTo }: OnboardingFormProps) {
   const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState(1);
   const [userType, setUserType] = useState<UserType>(null);
@@ -32,7 +36,7 @@ export default function OnboardingForm() {
       case 1:
         return <UserTypeSelection onSelect={handleUserTypeSelect} />;
       case 2:
-        return userType === "company" ? <CompanyForm /> : <JobSeekerForm />;
+        return userType === "company" ? <CompanyForm returnTo={returnTo} /> : <JobSeekerForm />;
       default:
         return null;
     }

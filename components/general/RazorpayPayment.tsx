@@ -155,19 +155,13 @@ export function RazorpayPayment({
 
   return (
     <div className="space-y-3">
-      {/* Development Mode Indicator */}
-      <div className="flex items-center gap-2 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
-        <span>🧪</span>
-        <span>TEST MODE - Use Razorpay test cards</span>
-      </div>
-      
       <Button
         onClick={handlePayment}
         disabled={loading}
         className="w-full"
         size="lg"
       >
-        {loading ? "Processing..." : `Pay ₹${amount} (Test)`}
+        {loading ? "Processing Payment..." : `Pay ₹${amount}`}
       </Button>
     </div>
   );

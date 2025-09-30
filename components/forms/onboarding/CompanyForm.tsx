@@ -34,7 +34,11 @@ import {
 import { countryList } from "@/app/utils/countriesList";
 import { UploadDropzone } from "@/components/general/UploadThingReExport";
 
-export default function CompanyForm() {
+interface CompanyFormProps {
+  returnTo?: string;
+}
+
+export default function CompanyForm({ returnTo }: CompanyFormProps) {
   const form = useForm<z.infer<typeof companySchema>>({
     resolver: zodResolver(companySchema),
     defaultValues: {
@@ -52,7 +56,7 @@ export default function CompanyForm() {
   async function onSubmit(values: z.infer<typeof companySchema>) {
     try {
       setPending(true);
-      await createCompany(values);
+      await createCompany(values, returnTo);
     } catch (error) {
       console.log(error);
       if (error instanceof Error && error.message !== "NEXT_REDIRECT") {

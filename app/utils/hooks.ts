@@ -25,7 +25,7 @@ export async function requireCompany() {
   });
 
   if (!company) {
-    redirect("/");
+    redirect("/onboarding");
   }
 
   return company;

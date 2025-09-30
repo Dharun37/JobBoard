@@ -22,7 +22,7 @@ const aj = arcjet
     })
   );
 
-export async function createCompany(data: z.infer<typeof companySchema>) {
+export async function createCompany(data: z.infer<typeof companySchema>, returnTo?: string) {
   const user = await requireUser();
 
   // Access the request object so Arcjet can analyze it
@@ -54,7 +54,7 @@ export async function createCompany(data: z.infer<typeof companySchema>) {
     },
   });
 
-  return redirect("/");
+  return redirect(returnTo || "/");
 }
 
 export async function createJobSeeker(data: z.infer<typeof jobSeekerSchema>) {

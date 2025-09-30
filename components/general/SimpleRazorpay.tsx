@@ -131,18 +131,13 @@ export function SimpleRazorpay({
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
-        <span>🧪</span>
-        <span>TEST MODE - Use test card: 4111 1111 1111 1111</span>
-      </div>
-      
       <Button
         onClick={handlePayment}
         disabled={loading}
         className="w-full"
         size="lg"
       >
-        {loading ? "Processing..." : `Pay ₹${amount} (Test)`}
+        {loading ? "Processing Payment..." : `Pay ₹${amount}`}
       </Button>
     </div>
   );

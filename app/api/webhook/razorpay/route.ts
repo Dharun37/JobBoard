@@ -5,6 +5,7 @@ import { createHmac } from "crypto";
 
 export async function POST(req: NextRequest) {
   try {
+    console.log("🔔 Razorpay webhook received!");
     const body = await req.text();
     const headersList = await headers();
     
@@ -56,19 +57,45 @@ export async function POST(req: NextRequest) {
       }
 
       // Update the job post status to ACTIVE
-      await prisma.jobPost.update({
+      const updatedJob = await prisma.jobPost.update({
         where: {
           id: jobId,
         },
         data: {
           status: "ACTIVE",
         },
+        select: {
+          id: true,
+          listingDuration: true,
+        },
       });
+
+      // Trigger Inngest job expiration event
+      console.log("🔄 Attempting to trigger Inngest event...", {
+        jobId: updatedJob.id,
+        expirationDays: updatedJob.listingDuration
+      });
+
+      try {
+        const { inngest } = await import("@/app/utils/inngest/client");
+        const inngestResult = await inngest.send({
+          name: "job/created",
+          data: {
+            jobId: updatedJob.id,
+            expirationDays: updatedJob.listingDuration,
+          },
+        });
+        
+        console.log("✅ Inngest event sent successfully:", inngestResult);
+      } catch (inngestError) {
+        console.error("❌ Failed to send Inngest event:", inngestError);
+      }
 
       // Optional: Store payment details
       // You can create a Payment model in Prisma schema to store payment information
       
       console.log(`Payment successful for job ${jobId}, payment ID: ${paymentId}`);
+      console.log(`Inngest event triggered for job expiration in ${updatedJob.listingDuration} days`);
     }
 
     return NextResponse.json({ status: "success" });
