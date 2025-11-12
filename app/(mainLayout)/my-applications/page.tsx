@@ -9,7 +9,6 @@ import Image from "next/image";
 import { ApplicationStatusBadge } from "@/components/general/ApplicationStatusBadge";
 import { ApplicationProgress } from "@/components/general/ApplicationProgress";
 import { ApplicationStatus } from "@/app/utils/applicationStatus";
-import { formatCurrency } from "@/app/utils/formatCurrency";
 
 type UserApplication = {
   id: string;

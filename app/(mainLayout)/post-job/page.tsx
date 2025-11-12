@@ -7,8 +7,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import React from "react";
-import ArcJetLogo from "@/public/arcjet.jpg";
-import InngestLogo from "@/public/inngest-locale.png";
 import Image from "next/image";
 import { CreateJobForm } from "@/components/forms/CreateJobForm";
 import { prisma } from "@/app/utils/db";

@@ -66,7 +66,7 @@ export const getApplicationStatusBadge = (status: ApplicationStatus): StatusBadg
 
 export const getStatusProgression = (currentStatus: ApplicationStatus): { completed: string[], current: string, upcoming: string[] } => {
   const allStatuses = ['PENDING', 'REVIEWED', 'ACCEPTED'] as const;
-  const currentIndex = allStatuses.indexOf(currentStatus as any);
+  const currentIndex = allStatuses.indexOf(currentStatus as 'PENDING' | 'REVIEWED' | 'ACCEPTED');
   
   // Handle rejection separately as it can happen at any stage
   if (currentStatus === 'REJECTED') {

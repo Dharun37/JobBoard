@@ -2,11 +2,9 @@ import { prisma } from "@/app/utils/db";
 import { auth } from "@/app/utils/auth";
 import { redirect } from "next/navigation";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Download } from "lucide-react";
 import Link from "next/link";
-import { ApplicationStatusBadge } from "@/components/general/ApplicationStatusBadge";
 import { ApplicationStatusUpdater } from "@/components/general/ApplicationStatusUpdater";
 import { ApplicationStatus } from "@/app/utils/applicationStatus";
 
