@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import arcjet, { detectBot, shield } from "./utils/arcjet";
 import { request } from "@arcjet/next";
+import { ApplicationStatus } from "@prisma/client";
 
 const aj = arcjet
   .withRule(
@@ -237,4 +238,45 @@ export async function applyToJob(formData: FormData) {
     console.error("Failed to apply to job:", error);
     throw error; // Re-throw to be handled by the form
   }
+}
+
+export async function updateApplicationStatus(
+  applicationId: string, 
+  newStatus: ApplicationStatus
+) {
+  const user = await requireUser();
+
+  // Verify user is a company and owns the job this application is for
+  const application = await prisma.jobApplication.findUnique({
+    where: { id: applicationId },
+    include: {
+      job: {
+        include: {
+          company: true
+        }
+      }
+    }
+  });
+
+  if (!application) {
+    throw new Error("Application not found");
+  }
+
+  if (application.job.company.userId !== user.id) {
+    throw new Error("Unauthorized: You can only update applications for your own jobs");
+  }
+
+  // Update the application status
+  await prisma.jobApplication.update({
+    where: { id: applicationId },
+    data: { status: newStatus }
+  });
+
+  revalidatePath("/job-applications");
+  return { success: true };
+}
+
+export async function handleLogout() {
+  const { signOut } = await import("./utils/auth");
+  await signOut({ redirectTo: "/" });
 }

@@ -29,107 +29,124 @@ interface Benefit {
 }
 
 export const benefits: Benefit[] = [
-  { id: "401k", label: "401(k)", icon: <Briefcase className="w-3 h-3" /> },
   {
-    id: "distributed",
-    label: "Distributed team",
-    icon: <Users className="w-3 h-3" />,
-  },
-  { id: "async", label: "Async", icon: <Zap className="w-3 h-3" /> },
-  {
-    id: "vision",
-    label: "Vision insurance",
-    icon: <Eye className="w-3 h-3" />,
-  },
-  {
-    id: "dental",
-    label: "Dental insurance",
-    icon: <Tooth className="w-3 h-3" />,
-  },
-  {
-    id: "medical",
-    label: "Medical insurance",
+    id: "health_insurance",
+    label: "Health Insurance",
     icon: <Heart className="w-3 h-3" />,
   },
   {
-    id: "unlimited_vacation",
-    label: "Unlimited vacation",
-    icon: <Umbrella className="w-3 h-3" />,
-  },
-  { id: "pto", label: "Paid time off", icon: <Clock className="w-3 h-3" /> },
-  {
-    id: "four_day",
-    label: "4 day workweek",
-    icon: <Calendar className="w-3 h-3" />,
-  },
-  {
-    id: "401k_matching",
-    label: "401k matching",
-    icon: <Coins className="w-3 h-3" />,
-  },
-  {
-    id: "company_retreats",
-    label: "Company retreats",
-    icon: <Building className="w-3 h-3" />,
-  },
-  {
-    id: "coworking_budget",
-    label: "Coworking budget",
-    icon: <Building className="w-3 h-3" />,
-  },
-  {
-    id: "learning_budget",
-    label: "Learning budget",
-    icon: <GraduationCap className="w-3 h-3" />,
-  },
-  {
-    id: "gym",
-    label: "Free gym membership",
-    icon: <Dumbbell className="w-3 h-3" />,
-  },
-  {
-    id: "mental_wellness",
-    label: "Mental wellness budget",
-    icon: <Brain className="w-3 h-3" />,
-  },
-  {
-    id: "home_office",
-    label: "Home office budget",
+    id: "remote_work",
+    label: "Remote Work",
     icon: <Home className="w-3 h-3" />,
   },
   {
-    id: "crypto",
-    label: "Pay in crypto",
-    icon: <Bitcoin className="w-3 h-3" />,
+    id: "flexible_hours",
+    label: "Flexible Hours",
+    icon: <Clock className="w-3 h-3" />,
   },
   {
-    id: "pseudonymous",
-    label: "Pseudonymous",
-    icon: <UserCircle className="w-3 h-3" />,
+    id: "paid_leave",
+    label: "Paid Leave",
+    icon: <Umbrella className="w-3 h-3" />,
   },
   {
-    id: "profit_sharing",
-    label: "Profit sharing",
-    icon: <PieChart className="w-3 h-3" />,
-  },
-  {
-    id: "equity",
-    label: "Equity compensation",
+    id: "performance_bonus",
+    label: "Performance Bonus",
     icon: <Coins className="w-3 h-3" />,
   },
   {
-    id: "no_whiteboard",
-    label: "No whiteboard interview",
+    id: "learning_budget",
+    label: "Learning & Development",
+    icon: <GraduationCap className="w-3 h-3" />,
+  },
+  {
+    id: "work_from_home",
+    label: "Work From Home",
     icon: <MonitorOff className="w-3 h-3" />,
   },
   {
-    id: "no_monitoring",
-    label: "No monitoring system",
+    id: "team_outings",
+    label: "Team Outings",
+    icon: <Users className="w-3 h-3" />,
+  },
+  {
+    id: "provident_fund",
+    label: "Provident Fund",
+    icon: <Briefcase className="w-3 h-3" />,
+  },
+  {
+    id: "life_insurance",
+    label: "Life Insurance",
     icon: <Shield className="w-3 h-3" />,
   },
   {
-    id: "hire_old_young",
-    label: "We hire old (and young)",
+    id: "laptop_provided",
+    label: "Laptop Provided",
+    icon: <Building className="w-3 h-3" />,
+  },
+  {
+    id: "internet_allowance",
+    label: "Internet Allowance",
+    icon: <Zap className="w-3 h-3" />,
+  },
+  {
+    id: "free_meals",
+    label: "Free Meals",
+    icon: <Heart className="w-3 h-3" />,
+  },
+  {
+    id: "gym_membership",
+    label: "Gym Membership",
+    icon: <Dumbbell className="w-3 h-3" />,
+  },
+  {
+    id: "career_growth",
+    label: "Career Growth",
     icon: <UserPlus className="w-3 h-3" />,
+  },
+  {
+    id: "casual_dress",
+    label: "Casual Dress Code",
+    icon: <UserCircle className="w-3 h-3" />,
+  },
+  {
+    id: "annual_bonus",
+    label: "Annual Bonus",
+    icon: <PieChart className="w-3 h-3" />,
+  },
+  {
+    id: "mental_health",
+    label: "Mental Health Support",
+    icon: <Brain className="w-3 h-3" />,
+  },
+  {
+    id: "transport_allowance",
+    label: "Transport Allowance",
+    icon: <Building className="w-3 h-3" />,
+  },
+  {
+    id: "five_day_week",
+    label: "5-Day Work Week",
+    icon: <Calendar className="w-3 h-3" />,
+  },
+  {
+    id: "stock_options",
+    label: "Stock Options",
+    icon: <Coins className="w-3 h-3" />,
+  },
+  {
+    id: "maternity_leave",
+    label: "Maternity/Paternity Leave",
+    icon: <Heart className="w-3 h-3" />,
+  },
+  {
+    id: "skill_development",
+    label: "Skill Development",
+    icon: <GraduationCap className="w-3 h-3" />,
+  },
+  {
+    id: "festival_bonus",
+    label: "Festival Bonus",
+    icon: <Calendar className="w-3 h-3" />,
   },
 ];

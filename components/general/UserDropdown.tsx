@@ -1,4 +1,6 @@
-import { signOut } from "@/app/utils/auth";
+"use client";
+
+import { handleLogout } from "@/app/actions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -73,23 +75,19 @@ export function UserDropdown({ email, name, image }: iAppProps) {
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <form
-            action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/" });
-            }}
-          >
-            <button type="submit" className="w-full flex items-center gap-2">
-              <LogOut
-                size={16}
-                strokeWidth={2}
-                className="opacity-60"
-                aria-hidden="true"
-              />
-              <span>Logout</span>
-            </button>
-          </form>
+        <DropdownMenuItem 
+          onClick={async () => {
+            await handleLogout();
+          }}
+          className="cursor-pointer"
+        >
+          <LogOut
+            size={16}
+            strokeWidth={2}
+            className="opacity-60"
+            aria-hidden="true"
+          />
+          <span>Logout</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

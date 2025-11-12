@@ -32,7 +32,7 @@ export async function Navbar() {
   }
 
   return (
-    <nav className="flex justify-between items-center py-5">
+    <nav className="flex justify-between items-center py-5" suppressHydrationWarning>
       <Link href="/" className="flex items-center gap-2">
         <Image src={Logo} alt="Job Board Logo" width={40} height={40} />
         <h1 className="text-2xl font-bold">

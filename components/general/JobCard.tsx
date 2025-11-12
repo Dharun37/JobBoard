@@ -17,6 +17,7 @@ interface iAppProps {
     employmentType: string;
     location: string;
     createdAt: Date;
+    listingDuration: number;
     company: {
       logo: string | null;
       name: string;
@@ -27,9 +28,22 @@ interface iAppProps {
 }
 
 export function JobCard({ job }: iAppProps) {
+  // Determine premium tier based on listing duration
+  const getPremiumTier = (duration: number) => {
+    if (duration >= 90) return { tier: "premium", label: "PREMIUM", color: "bg-gradient-to-r from-purple-500 to-pink-500" };
+    if (duration >= 60) return { tier: "featured", label: "FEATURED", color: "bg-gradient-to-r from-blue-500 to-cyan-500" };
+    return null;
+  };
+
+  const premiumTier = getPremiumTier(job.listingDuration);
+
   return (
     <Link href={`/job/${job.id}`}>
-      <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary relative">
+      <Card className={`hover:shadow-lg transition-all duration-300 hover:border-primary relative ${
+        premiumTier ? 'border-2 border-gradient shadow-md' : ''
+      } ${premiumTier?.tier === 'premium' ? 'ring-2 ring-purple-200' : ''} ${
+        premiumTier?.tier === 'featured' ? 'ring-2 ring-blue-200' : ''
+      }`}>
         <CardHeader>
           <div className="flex flex-col md:flex-row gap-4">
             {job.company.logo ? (

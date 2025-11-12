@@ -4,8 +4,11 @@ import { redirect } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Download, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Eye, Download } from "lucide-react";
 import Link from "next/link";
+import { ApplicationStatusBadge } from "@/components/general/ApplicationStatusBadge";
+import { ApplicationStatusUpdater } from "@/components/general/ApplicationStatusUpdater";
+import { ApplicationStatus } from "@/app/utils/applicationStatus";
 
 type JobApplication = {
   id: string;
@@ -96,23 +99,7 @@ const JobApplicationsPage = async () => {
 
   const applications = await getJobApplications(session.user.id!);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "ACCEPTED": return "bg-green-100 text-green-800";
-      case "REJECTED": return "bg-red-100 text-red-800";
-      case "REVIEWED": return "bg-blue-100 text-blue-800";
-      default: return "bg-yellow-100 text-yellow-800";
-    }
-  };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "ACCEPTED": return <CheckCircle className="w-4 h-4" />;
-      case "REJECTED": return <XCircle className="w-4 h-4" />;
-      case "REVIEWED": return <Eye className="w-4 h-4" />;
-      default: return <Clock className="w-4 h-4" />;
-    }
-  };
 
   return (
     <div className="container mx-auto py-8">
@@ -149,13 +136,11 @@ const JobApplicationsPage = async () => {
                     {application.job.location} • {application.job.employmentType}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge 
-                    className={`${getStatusColor(application.status)} flex items-center gap-1`}
-                  >
-                    {getStatusIcon(application.status)}
-                    {application.status}
-                  </Badge>
+                <div className="flex flex-col items-end gap-2">
+                  <ApplicationStatusUpdater
+                    applicationId={application.id}
+                    currentStatus={application.status as ApplicationStatus}
+                  />
                   <span className="text-xs text-muted-foreground">
                     {application.appliedAt.toLocaleDateString()}
                   </span>

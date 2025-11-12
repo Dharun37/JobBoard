@@ -185,7 +185,10 @@ model JobApplication {
 
 enum ApplicationStatus {
   PENDING
+  SEEN
   REVIEWED
+  SHORTLISTED
   ACCEPTED
   REJECTED
+  SELECTED
 }

@@ -2,11 +2,14 @@ import { prisma } from "@/app/utils/db";
 import { auth } from "@/app/utils/auth";
 import { redirect } from "next/navigation";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, CheckCircle, XCircle, Clock, Building } from "lucide-react";
+import { Eye, Building } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { ApplicationStatusBadge } from "@/components/general/ApplicationStatusBadge";
+import { ApplicationProgress } from "@/components/general/ApplicationProgress";
+import { ApplicationStatus } from "@/app/utils/applicationStatus";
+import { formatCurrency } from "@/app/utils/formatCurrency";
 
 type UserApplication = {
   id: string;
@@ -69,23 +72,7 @@ const MyApplicationsPage = async () => {
 
   const applications = await getUserApplications(session.user.id!);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "ACCEPTED": return "bg-green-100 text-green-800";
-      case "REJECTED": return "bg-red-100 text-red-800";
-      case "REVIEWED": return "bg-blue-100 text-blue-800";
-      default: return "bg-yellow-100 text-yellow-800";
-    }
-  };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "ACCEPTED": return <CheckCircle className="w-4 h-4" />;
-      case "REJECTED": return <XCircle className="w-4 h-4" />;
-      case "REVIEWED": return <Eye className="w-4 h-4" />;
-      default: return <Clock className="w-4 h-4" />;
-    }
-  };
 
   return (
     <div className="container mx-auto py-8">
@@ -138,12 +125,11 @@ const MyApplicationsPage = async () => {
                     </p>
                   </div>
                 </div>
-                <Badge 
-                  className={`${getStatusColor(application.status)} flex items-center gap-1`}
-                >
-                  {getStatusIcon(application.status)}
-                  {application.status}
-                </Badge>
+                <div className="flex flex-col items-end gap-2">
+                  <ApplicationStatusBadge 
+                    status={application.status as ApplicationStatus}
+                  />
+                </div>
               </div>
 
               {application.coverLetter && (
@@ -154,6 +140,11 @@ const MyApplicationsPage = async () => {
                   </p>
                 </div>
               )}
+
+              <div className="mb-4">
+                <h4 className="font-medium mb-2 text-sm">Application Progress:</h4>
+                <ApplicationProgress status={application.status as ApplicationStatus} />
+              </div>
 
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" asChild>

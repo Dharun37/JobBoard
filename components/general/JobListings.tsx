@@ -38,6 +38,7 @@ async function getJobs(
         employmentType: true,
         location: true,
         createdAt: true,
+        listingDuration: true,
         company: {
           select: {
             name: true,
@@ -47,9 +48,14 @@ async function getJobs(
           },
         },
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: [
+        {
+          listingDuration: "desc", // Premium placement: longer duration = higher priority
+        },
+        {
+          createdAt: "desc", // Within same tier, newest first
+        },
+      ],
     }),
     prisma.jobPost.count({ where }),
   ]);
