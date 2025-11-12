@@ -15,6 +15,7 @@ type FavoriteWithJob = {
     employmentType: string;
     location: string;
     createdAt: Date;
+    listingDuration: number;
     company: {
       name: string;
       logo: string | null;
@@ -39,6 +40,7 @@ async function getFavorites(userId: string) {
           employmentType: true,
           location: true,
           createdAt: true,
+          listingDuration: true,
           company: {
             select: {
               name: true,
