@@ -1,19 +1,11 @@
 import Razorpay from "razorpay";
 import { createHmac } from "crypto";
 
-// Only initialize Razorpay in development mode
-const isDevelopment = process.env.NODE_ENV === "development";
-
 console.log("🔧 Razorpay Environment Check:", {
   NODE_ENV: process.env.NODE_ENV,
   RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID ? "✅ Set" : "❌ Missing",
   RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET ? "✅ Set" : "❌ Missing",
-  isDevelopment
 });
-
-if (!isDevelopment) {
-  console.warn("⚠️  Razorpay is configured for DEVELOPMENT MODE ONLY");
-}
 
 // Initialize Razorpay with better error handling
 function createRazorpayInstance(): Razorpay | null {
@@ -26,11 +18,6 @@ function createRazorpayInstance(): Razorpay | null {
         keyId: keyId ? "Present" : "Missing",
         keySecret: keySecret ? "Present" : "Missing"
       });
-      return null;
-    }
-
-    if (!isDevelopment) {
-      console.warn("⚠️ Razorpay only works in development mode");
       return null;
     }
 
@@ -49,10 +36,10 @@ function createRazorpayInstance(): Razorpay | null {
 
 export const razorpay = createRazorpayInstance();
 
-// Razorpay configuration for frontend (development only)
+// Razorpay configuration for frontend
 export const razorpayConfig = {
   key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
-  isDevelopment,
+  environment: process.env.NODE_ENV,
 };
 
 // Helper function to verify payment signature
@@ -61,10 +48,6 @@ export function verifyPaymentSignature(
   paymentId: string,
   signature: string
 ): boolean {
-  if (!isDevelopment) {
-    throw new Error("Razorpay is only available in development mode");
-  }
-  
   try {
     const expectedSignature = createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
       .update(orderId + "|" + paymentId)
