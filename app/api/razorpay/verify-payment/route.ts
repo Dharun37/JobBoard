@@ -3,14 +3,6 @@ import { prisma } from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  // Only allow in development mode
-  if (process.env.NODE_ENV !== "development") {
-    return NextResponse.json(
-      { error: "Razorpay is only available in development mode" },
-      { status: 403 }
-    );
-  }
-
   try {
     const {
       razorpay_order_id,
@@ -19,7 +11,7 @@ export async function POST(req: NextRequest) {
       jobId,
     } = await req.json();
 
-    console.log("🧪 Verifying Razorpay TEST payment for job:", jobId);
+    console.log("🧪 Verifying Razorpay payment for job:", jobId, "in", process.env.NODE_ENV);
 
     // Verify payment signature
     const isValid = verifyPaymentSignature(

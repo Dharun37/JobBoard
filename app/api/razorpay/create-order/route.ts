@@ -3,25 +3,17 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   console.log("🔧 API Request - Environment:", process.env.NODE_ENV);
-  
-  // Only allow in development mode
-  if (process.env.NODE_ENV !== "development") {
-    console.error("❌ Not in development mode");
-    return NextResponse.json(
-      { error: "Razorpay is only available in development mode" },
-      { status: 403 }
-    );
-  }
 
   try {
     const { amount, currency = "INR", jobId, userId } = await req.json();
 
-    console.log("🧪 Creating Razorpay TEST order:", {
+    console.log("🧪 Creating Razorpay order:", {
       jobId,
       amount,
       currency,
       userId,
-      razorpayInitialized: !!razorpay
+      razorpayInitialized: !!razorpay,
+      environment: process.env.NODE_ENV
     });
 
     if (!razorpay) {
@@ -55,7 +47,7 @@ export async function POST(req: NextRequest) {
       notes: {
         jobId,
         userId,
-        mode: "TEST", // Mark as test transaction
+        mode: process.env.NODE_ENV, // Mark environment
       },
     });
 
@@ -66,7 +58,7 @@ export async function POST(req: NextRequest) {
       amount: order.amount,
       currency: order.currency,
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-      testMode: true,
+      environment: process.env.NODE_ENV,
     });
   } catch (error) {
     console.error("❌ Error creating Razorpay order:", error);
